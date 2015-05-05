@@ -1,0 +1,20 @@
+---
+# TODO: Create deploy user
+- name: Create deploy key for dharrigan
+  copy: src=/Users/dharrigan/.ssh/davidharrigan.net/id_rsa dest=/home/dharrigan/.ssh/davidharrigan.net.private owner=dharrigan group=staff mode=0644
+
+- name: Clone repo
+  git: repo=git@github.com:davidharrigan/davidharrigan.net.git
+       key_file=/home/dharrigan/.ssh/davidharrigan.net.private
+       dest=/var/www/apps/davidharrigan.net
+       accept_hostkey=True
+
+# TODO: Make GCAPTCHA secret
+- name: Build and run docker
+  sudo: yes
+  shell: 'cd /var/www/apps/davidharrigan.net; {{ item }}'
+  with_items:
+    - make build_app
+    - make run_prod
+  environment:
+    GCAPTCHA_SECRET: 6LdJQwYTAAAAAIev3JF4tEB-bZHXY9xnAwtBuSKx

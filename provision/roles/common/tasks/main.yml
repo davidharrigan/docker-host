@@ -1,0 +1,40 @@
+---
+- name: Update apt cache if needed
+  sudo: yes
+  apt: update_cache=yes cache_valid_time=3600
+
+- name: Install packages
+  sudo: yes
+  apt: name="{{ item }}" state=latest
+  with_items:
+    - build-essential
+    - git
+    - python3
+    - python3-dev
+    - python-dev
+    - python-pip
+
+- name: Add groups
+  sudo: yes
+  group: name="{{ item }}" state=present
+  with_items:
+    - developers
+    - staff
+    - vboxusers
+    - sudo
+    - ssh
+    - users
+
+- name: Add dharrigan
+  sudo: yes
+  user:
+    name=dharrigan
+    comment="David Harrigan"
+    state=present
+    generate_ssh_key=yes
+    ssh_key_bits=2048
+    ssh_key_file=.ssh/id_rsa
+    group=staff
+    append=yes
+    groups=sudo,users,developers,staff,vboxusers
+
