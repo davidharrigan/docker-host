@@ -1,0 +1,21 @@
+---
+- include_vars: users.yml
+
+- name: add users
+  sudo: yes
+  user:
+    name: "{{ item.name }}"
+    group: "{{ item.group }}"
+    groups: "{{ item.groups }}"
+    state: present
+    append: yes
+  with_items: users
+
+- name: copy ssh keys
+  sudo: yes
+  copy:
+    src: ssh/{{ item.name }}.pub
+    dest: /home/{{ item.name }}/.ssh/id_rsa.pub
+    owner: "{{ item.name }}"
+    mode: 0644
+  with_items: users

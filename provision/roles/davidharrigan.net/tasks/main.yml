@@ -10,11 +10,23 @@
        accept_hostkey=True
 
 # TODO: Make GCAPTCHA secret
-- name: Build and run docker
+# TODO: pull from docker registry
+- name: Build app docker container
   sudo: yes
   shell: 'cd /var/www/apps/davidharrigan.net; {{ item }}'
   with_items:
     - make build_app
-    - make run_prod
-  environment:
-    GCAPTCHA_SECRET: 6LdJQwYTAAAAAIev3JF4tEB-bZHXY9xnAwtBuSKx
+
+- name: Make sure our app is running
+  docker:
+    name: app
+    image: app
+    state: present
+    ports:
+    - "8080:8080"
+    env:
+      GCAPTCHA_SECRET: 6LdJQwYTAAAAAIev3JF4tEB-bZHXY9xnAwtBuSKx
+
+- name: generate nginx config
+  template: src=nginx.conf.j2 dest=/etc/nginx/conf.d/davidharrigan.net.conf
+  notify: restart nginx

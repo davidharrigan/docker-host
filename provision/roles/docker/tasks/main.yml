@@ -1,28 +1,23 @@
 ---
-- name: Install (or update) docker.io
-  apt:
-    name: docker.io
-    state: latest
-    update_cache: yes
-  when: "ansible_distribution_version == '14.04'"
+- name: Add docker apt repo key
+  sudo: yes
+  apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=36A1D7869245C8950F966E92D8576A8BA88D21E9
 
-- name: Link docker binaries
-  file: 
-    src: /usr/bin/docker.io
-    dest: /usr/local/bin/docker
-    owner: root
-    group: root
-    state: link
-  when: "ansible_distribution_version == '14.04'"
+- name: Add docker repo
+  sudo: yes
+  apt_repository: repo='deb https://get.docker.com/ubuntu docker main' state=present
 
-- name: Check if docker installed
-  command: /usr/bin/test -e /etc/default/docker.io
-  register: docker_installed
+- name: Install docker
+  sudo: yes
+  apt: name="{{ item }}" update_cache=yes
+  with_items:
+    - lxc-docker
+    - lxc-docker-1.6.0
 
-- name: Expose docker host
-  lineinfile:
-    dest=/etc/default/docker.io
-    regexp="^#DOCKER_OPTS.*"
-    line="DOCKER_OPTS=\"-H unix:// -H tcp://{{ docker_host_ip }}:{{ docker_host_port }}\""
-  notify: "restart docker"
-  when: "docker_installed and export_docker_host"
+- name: ensure docker is linked
+  sudo: yes
+  shell: ln -sf /usr/bin/docker.io /usr/local/bin/docker creates=/usr/local/bin/docker
+
+- name: Install Docker Python library.
+  sudo: yes
+  pip: name=docker-py version=1.1.0
