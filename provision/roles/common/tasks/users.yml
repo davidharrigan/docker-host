@@ -31,9 +31,11 @@
   with_items: users
 
 - name: ensure github.com is a known host
+  sudo: yes
   lineinfile:
     dest: /home/deploy/.ssh/known_hosts
     create: yes
     state: present
     line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
     regexp: "^github\\.com"
+    owner: deploy

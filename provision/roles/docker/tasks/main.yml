@@ -1,5 +1,5 @@
 ---
-- name: add docker apt repo
+- name: add docker apt key
   sudo: yes
   apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=36A1D7869245C8950F966E92D8576A8BA88D21E9
 

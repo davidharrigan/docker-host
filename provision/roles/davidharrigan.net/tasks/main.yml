@@ -17,6 +17,8 @@
     accept_hostkey: True
     version: 0.0.1
   register: gitclone
+  tags:
+    - deploy
 
 # TODO: Make GCAPTCHA secret
 # TODO: pull from docker registry
@@ -26,6 +28,8 @@
   shell: 'cd /var/www/apps/davidharrigan.net; {{ item }}'
   with_items:
     - make build_app
+  tags:
+    - deploy
   when: gitclone.changed
 
 - name: ensure the container is running
@@ -38,3 +42,5 @@
     - "8080:8080"
     env:
       GCAPTCHA_SECRET: 6LdJQwYTAAAAAIev3JF4tEB-bZHXY9xnAwtBuSKx
+  tags:
+    - deploy
