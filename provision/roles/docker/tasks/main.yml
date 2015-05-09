@@ -1,23 +1,26 @@
 ---
-- name: Add docker apt repo key
+- name: add docker apt repo
   sudo: yes
   apt_key: keyserver=hkp://p80.pool.sks-keyservers.net:80 id=36A1D7869245C8950F966E92D8576A8BA88D21E9
 
-- name: Add docker repo
+- name: add docker repo
   sudo: yes
   apt_repository: repo='deb https://get.docker.com/ubuntu docker main' state=present
 
-- name: Install docker
+- name: install docker
   sudo: yes
   apt: name="{{ item }}" update_cache=yes
   with_items:
     - lxc-docker
-    - lxc-docker-1.6.0
+    - lxc-docker-1.6.1
 
 - name: ensure docker is linked
   sudo: yes
-  shell: ln -sf /usr/bin/docker.io /usr/local/bin/docker creates=/usr/local/bin/docker
+  file:
+    src: /usr/bin/docker
+    dest: /usr/local/bin/docker
+    state: link
 
-- name: Install Docker Python library.
+- name: install docker-py
   sudo: yes
   pip: name=docker-py version=1.1.0

@@ -1,5 +1,28 @@
 ---
 - name: Installs nginx web server
-  apt: pkg=nginx state=installed update_cache=true
+  sudo: yes
+  apt: name=nginx state=installed
   notify:
     - start nginx
+
+- name: generate nginx config for davidharrigan.net
+  sudo: yes
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/sites-available/davidharrigan.net.conf
+  notify: reload nginx
+
+- name: remove default nginx config
+  sudo: yes
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+    follow: yes
+
+- name: link nginx config
+  sudo: yes
+  file:
+    src: /etc/nginx/sites-available/davidharrigan.net.conf
+    dest: /etc/nginx/sites-enabled/davidharrigan.net.conf
+    state: link
+  notify: reload nginx

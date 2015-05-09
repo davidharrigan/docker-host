@@ -15,7 +15,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     v.customize ["modifyvm", :id, "--ioapic", "on"]
   end
 
-  config.vm.hostname = "vagrant"
+  config.vm.hostname = "local"
   config.vm.network :private_network, ip: "192.168.33.27"
 
   # Set the name of the VM. See: http://stackoverflow.com/a/17864388/100134

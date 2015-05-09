@@ -5,7 +5,9 @@
 
 - name: install packages
   sudo: yes
-  apt: name="{{ item }}" state=latest
+  apt:
+    name: "{{ item }}"
+    state: latest
   with_items:
     - build-essential
     - git
@@ -17,14 +19,15 @@
     - python-setuptools
     - openssh-server
 
-# TODO: don't do this
 - name: install latest pip
   sudo: yes
   shell: 'easy_install -U pip'
 
 - name: add groups
   sudo: yes
-  group: name="{{ item }}" state=present
+  group:
+    name: "{{ item }}"
+    state: present
   with_items:
     - sudo
     - admin

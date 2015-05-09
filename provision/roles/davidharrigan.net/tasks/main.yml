@@ -1,32 +1,40 @@
 ---
-# TODO: Create deploy user
-- name: Create deploy key for dharrigan
-  copy: src=/Users/dharrigan/.ssh/davidharrigan.net/id_rsa dest=/home/dharrigan/.ssh/davidharrigan.net.private owner=dharrigan group=staff mode=0644
+- name: create deploy key
+  sudo: yes
+  copy:
+    src: /Users/dharrigan/.ssh/davidharrigan.net/id_rsa
+    dest: /home/deploy/.ssh/davidharrigan.net.private
+    owner: deploy
+    group: admin
+    mode: 0644
 
-- name: Clone repo
-  git: repo=git@github.com:davidharrigan/davidharrigan.net.git
-       key_file=/home/dharrigan/.ssh/davidharrigan.net.private
-       dest=/var/www/apps/davidharrigan.net
-       accept_hostkey=True
+- name: clone repo
+  sudo: yes
+  git:
+    repo: git@github.com:davidharrigan/davidharrigan.net.git
+    key_file: /home/deploy/.ssh/davidharrigan.net.private
+    dest: /var/www/apps/davidharrigan.net
+    accept_hostkey: True
+    version: 0.0.1
+  register: gitclone
 
 # TODO: Make GCAPTCHA secret
 # TODO: pull from docker registry
-- name: Build app docker container
+# TODO: only build if we have to
+- name: build container for davidharrigan.net application
   sudo: yes
   shell: 'cd /var/www/apps/davidharrigan.net; {{ item }}'
   with_items:
     - make build_app
+  when: gitclone.changed
 
-- name: Make sure our app is running
+- name: ensure the container is running
+  sudo: yes
   docker:
     name: app
     image: app
-    state: present
+    state: reloaded
     ports:
     - "8080:8080"
     env:
       GCAPTCHA_SECRET: 6LdJQwYTAAAAAIev3JF4tEB-bZHXY9xnAwtBuSKx
-
-- name: generate nginx config
-  template: src=nginx.conf.j2 dest=/etc/nginx/conf.d/davidharrigan.net.conf
-  notify: restart nginx

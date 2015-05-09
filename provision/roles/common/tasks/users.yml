@@ -6,9 +6,19 @@
   user:
     name: "{{ item.name }}"
     group: "{{ item.group }}"
-    groups: "{{ item.groups }}"
     state: present
+    createhome: yes
     append: yes
+  with_items: users
+
+- name: create .ssh dir for users
+  sudo: yes
+  file:
+    dest: /home/{{ item.name }}/.ssh/id_rsa.pub
+    mode: 0644
+    owner: "{{ item.name }}"
+    group: "{{ item.group }}"
+    state: directory
   with_items: users
 
 - name: copy ssh keys
@@ -19,3 +29,11 @@
     owner: "{{ item.name }}"
     mode: 0644
   with_items: users
+
+- name: ensure github.com is a known host
+  lineinfile:
+    dest: /home/deploy/.ssh/known_hosts
+    create: yes
+    state: present
+    line: "{{ lookup('pipe', 'ssh-keyscan -t rsa github.com') }}"
+    regexp: "^github\\.com"
