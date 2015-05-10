@@ -15,7 +15,7 @@
     key_file: /home/deploy/.ssh/davidharrigan.net.private
     dest: /var/www/apps/davidharrigan.net
     accept_hostkey: True
-    version: 0.0.1
+    version: 0.0.4
   register: gitclone
   tags:
     - deploy
@@ -32,6 +32,7 @@
     - deploy
   when: gitclone.changed
 
+# TODO: secrets
 - name: ensure the container is running
   sudo: yes
   docker:
@@ -42,5 +43,7 @@
     - "8080:8080"
     env:
       GCAPTCHA_SECRET: 6LdJQwYTAAAAAIev3JF4tEB-bZHXY9xnAwtBuSKx
+      GMAIL_USER: davidharrigan.net
+      GMAIL_PASS: qweasd123!
   tags:
     - deploy
