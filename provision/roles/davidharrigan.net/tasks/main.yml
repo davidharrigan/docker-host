@@ -15,7 +15,7 @@
     key_file: /home/deploy/.ssh/davidharrigan.net.private
     dest: /var/www/apps/davidharrigan.net
     accept_hostkey: True
-    version: 0.0.4
+    version: 0.0.5
   register: gitclone
   tags:
     - deploy
