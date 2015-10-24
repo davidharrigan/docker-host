@@ -1,4 +1,6 @@
 ---
+- include_vars: secrets.yml
+
 - name: create deploy key
   sudo: yes
   copy:
@@ -20,7 +22,6 @@
   tags:
     - deploy
 
-# TODO: Make GCAPTCHA secret
 # TODO: pull from docker registry
 # TODO: only build if we have to
 - name: build container for davidharrigan.net application
@@ -42,8 +43,8 @@
     ports:
     - "8080:8080"
     env:
-      GCAPTCHA_SECRET: 6LdJQwYTAAAAAIev3JF4tEB-bZHXY9xnAwtBuSKx
-      GMAIL_USER: davidharrigan.net
-      GMAIL_PASS: qweasd123!
+      GCAPTCHA_SECRET: '{{ gcaptcha_secret }}'
+      GMAIL_USER: '{{ gmail_user }}'
+      GMAIL_PASS: '{{ gmail_pass }}'
   tags:
     - deploy
